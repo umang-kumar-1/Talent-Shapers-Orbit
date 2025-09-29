@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import type { Student, Trainer, Course, FeePayment, Expense, Assignment } from '../types';
+import type { Student, Trainer, Course, FeePayment, Expense, Assignment } from '../../../types';
 
 const initialCourses: Course[] = [
   { id: 'c1', name: 'Fundamentals of Spoken English', category: 'Spoken English', level: 'Basic', duration: '3 Months', totalFee: 1000 },

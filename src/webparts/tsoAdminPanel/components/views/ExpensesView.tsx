@@ -6,6 +6,7 @@ import ConfirmationModal from '../common/ConfirmationModal';
 import { useMockData } from '../../hooks/useMockData';
 import type { Expense } from "../../../../types";
 import styles from "./ExpensesView.module.scss";
+import { ExpenseContext } from '../context/ExpenseContext';
 
 // Icons
 const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -59,7 +60,8 @@ const toBase64 = (file: File): Promise<string> =>
   });
 
 const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data }) => {
-  const { expenses, addExpense, updateExpense, deleteExpense } = data;
+  const {expenseData } = React.useContext(ExpenseContext);
+  const { addExpense, updateExpense, deleteExpense } = data;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
@@ -138,18 +140,18 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
 
       {/* Table */}
       <Table headers={['Description', 'Category', 'Amount', 'Date', 'Bill', 'Actions']}>
-        {expenses.map(expense => (
-          <tr key={expense.id} className={styles.tableRow}>
+        {expenseData.map((item:any) => (
+          <tr key={item.id} className={styles.tableRow}>
             <td className={styles.tableCell}>
-              <div className={styles.description}>{expense.description}</div>
-              {expense.comments && <div className={styles.comments}>{expense.comments}</div>}
+              <div className={styles.description}>{item.Description}</div>
+              {item.Comments && <div className={styles.comments}>{item.Comments}</div>}
             </td>
-            <td className={styles.tableCell}>{expense.category}</td>
-            <td className={styles.amountCell}>-₹{expense.amount.toLocaleString()}</td>
-            <td className={styles.tableCell}>{expense.date}</td>
+            <td className={styles.tableCell}>{item.Category}</td>
+            <td className={styles.amountCell}>-₹{item.Amount.toLocaleString()}</td>
+            <td className={styles.tableCell}>{item.Date.substring(0, 10)}</td>
             <td className={styles.tableCell}>
-              {expense.billUrl ? (
-                <a href={expense.billUrl} target="_blank" rel="noopener noreferrer" className={styles.billLink}>
+              {item.billUrl ? (
+                <a href={item.billUrl} target="_blank" rel="noopener noreferrer" className={styles.billLink}>
                   <DocumentIcon className={styles.icon} />
                 </a>
               ) : (
@@ -158,10 +160,10 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
             </td>
             <td className={styles.tableCell}>
               <div className={styles.actions}>
-                <button onClick={() => handleOpenModal(expense)} className={styles.iconButton}>
+                <button onClick={() => handleOpenModal(item)} className={styles.iconButton}>
                   <EditIcon className={styles.icon} />
                 </button>
-                <button onClick={() => setExpenseToDelete(expense)} className={styles.iconButton}>
+                <button onClick={() => setExpenseToDelete(item)} className={styles.iconButton}>
                   <DeleteIcon className={styles.icon} />
                 </button>
               </div>
