@@ -1,4 +1,5 @@
 import * as React from "react";
+import styles from "./Modal.module.scss";
 
 interface ModalProps {
   title: string;
@@ -7,7 +8,6 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ title, onClose, children }) => {
-  // Handle Escape key to close modal
   React.useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -20,80 +20,25 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children }) => {
 
   return (
     <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.6)",
-        zIndex: 50,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "16px",
-        animation: "fadeIn 0.2s ease-out",
-      }}
+      className={styles.backdrop}
       aria-modal="true"
       role="dialog"
       onClick={onClose}
     >
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
       <div
-        style={{
-          backgroundColor: "#ffffff",
-          borderRadius: "12px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-          width: "100%",
-          maxWidth: "640px",
-          animation: "scaleIn 0.2s ease-out",
-        }}
+        className={styles.modal}
         onClick={(e) => e.stopPropagation()}
         role="document"
       >
         {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "20px",
-            borderBottom: "1px solid #e2e8f0",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#1e293b",
-              margin: 0,
-            }}
-          >
-            {title}
-          </h2>
+        <div className={styles.header}>
+          <h2 className={styles.title}>{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close modal"
-            style={{
-              color: "#94a3b8",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              borderRadius: "9999px",
-              padding: "4px",
-              transition: "color 0.2s ease-in-out",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "#475569")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#94a3b8")}
+            className={styles.closeButton}
           >
             <svg
-              style={{ width: "24px", height: "24px" }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -110,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children }) => {
         </div>
 
         {/* Body */}
-        <div style={{ padding: "24px" }}>{children}</div>
+        <div className={styles.body}>{children}</div>
       </div>
     </div>
   );

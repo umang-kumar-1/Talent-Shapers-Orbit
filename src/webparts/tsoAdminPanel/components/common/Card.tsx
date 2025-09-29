@@ -1,68 +1,29 @@
 import * as React from "react";
+import styles from "./Card.module.scss";
 
 interface CardProps {
   title: string;
   value: string | number;
   icon: React.ReactElement;
   colors: {
-    bg: string;   // Expecting something like "#f0f0f0"
-    icon: string; // Expecting something like "#000000"
+    bg: string;
+    icon: string;
   };
 }
 
 const Card: React.FC<CardProps> = ({ title, value, icon, colors }) => {
   return (
-    <div
-      style={{
-        backgroundColor: "#ffffff",
-        padding: "24px",
-        borderRadius: "12px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <div>
-        <p
-          style={{
-            fontSize: "14px",
-            fontWeight: 500,
-            color: "#64748b", // slate-500
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            margin: 0,
-          }}
-        >
-          {title}
-        </p>
-        <p
-          style={{
-            fontSize: "30px",
-            fontWeight: "bold",
-            color: "#1e293b", // slate-800
-            margin: 0,
-          }}
-        >
-          {value}
-        </p>
+    <div className={styles.card}>
+      <div className={styles["card-content"]}>
+        <p className={styles["card-title"]}>{title}</p>
+        <p className={styles["card-value"]}>{value}</p>
       </div>
       <div
-        style={{
-          padding: "12px",
-          borderRadius: "9999px",
-          backgroundColor: colors.bg,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        className={styles["card-icon"]}
+        style={{ backgroundColor: colors.bg }}
       >
         {React.cloneElement(icon, {
-          style: {
-            width: "28px",
-            height: "28px",
-            color: colors.icon,
-          },
+          style: { color: colors.icon },
         })}
       </div>
     </div>

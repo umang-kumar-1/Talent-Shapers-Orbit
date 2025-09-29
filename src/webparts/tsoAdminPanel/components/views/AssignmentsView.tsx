@@ -4,8 +4,7 @@ import Table from "../common/Table";
 import Modal from "../common/Modal";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { useMockData } from "../../hooks/useMockData";
-import type { Assignment } from "../../types";
-
+import { Assignment } from '../../../../types'
 // Icons
 const EditIcon: React.FC<{ className?: string }> = (props) => (
   <svg

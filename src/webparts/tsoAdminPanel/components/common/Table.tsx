@@ -1,4 +1,5 @@
 import * as React from "react";
+import styles from "./Table.module.scss";
 
 interface TableProps {
   headers: string[];
@@ -7,33 +8,12 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ headers, children }) => {
   return (
-    <div
-      style={{
-        backgroundColor: "#ffffff",
-        borderRadius: "12px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-        overflowX: "auto",
-      }}
-    >
-      <table style={{ width: "100%", textAlign: "left", borderCollapse: "collapse" }}>
+    <div className={styles.tableContainer}>
+      <table className={styles.table}>
         <thead>
-          <tr
-            style={{
-              borderBottom: "1px solid #e2e8f0", // slate-200
-            }}
-          >
+          <tr className={styles.theadRow}>
             {headers.map((header, index) => (
-              <th
-                key={index}
-                style={{
-                  padding: "12px 16px",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: "#64748b", // slate-500
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
+              <th key={index} className={styles.th}>
                 {header}
               </th>
             ))}

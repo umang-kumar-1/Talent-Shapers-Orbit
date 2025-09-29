@@ -4,10 +4,11 @@ import Table from "../common/Table";
 import Modal from "../common/Modal";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { useMockData } from "../../hooks/useMockData";
-import type { Trainer } from "../../types";
+import type { Trainer } from "../../../../types";
+import styles from "./TrainersView.module.scss"; // ✅ Import CSS Module
 
 // Icons
-const EditIcon: React.FC<{ style?: React.CSSProperties }> = (props) => (
+const EditIcon: React.FC<{ className?: string }> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +25,7 @@ const EditIcon: React.FC<{ style?: React.CSSProperties }> = (props) => (
   </svg>
 );
 
-const DeleteIcon: React.FC<{ style?: React.CSSProperties }> = (props) => (
+const DeleteIcon: React.FC<{ className?: string }> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -45,58 +46,18 @@ const DeleteIcon: React.FC<{ style?: React.CSSProperties }> = (props) => (
 const FormInput: React.FC<
   React.InputHTMLAttributes<HTMLInputElement> & { label: string }
 > = ({ label, ...props }) => (
-  <div style={{ marginBottom: "16px" }}>
-    <label
-      style={{
-        display: "block",
-        fontSize: "14px",
-        fontWeight: 500,
-        color: "#334155",
-        marginBottom: "4px",
-      }}
-    >
-      {label}
-    </label>
-    <input
-      {...props}
-      style={{
-        width: "100%",
-        padding: "8px 12px",
-        border: "1px solid #CBD5E1",
-        borderRadius: "6px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-        outline: "none",
-      }}
-    />
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <input {...props} className={styles.input} />
   </div>
 );
 
 const FormSelect: React.FC<
   React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }
 > = ({ label, children, ...props }) => (
-  <div style={{ marginBottom: "16px" }}>
-    <label
-      style={{
-        display: "block",
-        fontSize: "14px",
-        fontWeight: 500,
-        color: "#334155",
-        marginBottom: "4px",
-      }}
-    >
-      {label}
-    </label>
-    <select
-      {...props}
-      style={{
-        width: "100%",
-        padding: "8px 12px",
-        border: "1px solid #CBD5E1",
-        borderRadius: "6px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-        outline: "none",
-      }}
-    >
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <select {...props} className={styles.select}>
       {children}
     </select>
   </div>
@@ -105,30 +66,9 @@ const FormSelect: React.FC<
 const FormTextArea: React.FC<
   React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }
 > = ({ label, ...props }) => (
-  <div style={{ marginBottom: "16px" }}>
-    <label
-      style={{
-        display: "block",
-        fontSize: "14px",
-        fontWeight: 500,
-        color: "#334155",
-        marginBottom: "4px",
-      }}
-    >
-      {label}
-    </label>
-    <textarea
-      {...props}
-      rows={3}
-      style={{
-        width: "100%",
-        padding: "8px 12px",
-        border: "1px solid #CBD5E1",
-        borderRadius: "6px",
-        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-        outline: "none",
-      }}
-    />
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <textarea {...props} rows={3} className={styles.textarea} />
   </div>
 );
 
@@ -160,12 +100,11 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
   };
   const [formState, setFormState] = useState(initialFormState);
 
-  const getExpertiseNames = (expertiseIds: string[]) => {
-    return expertiseIds
+  const getExpertiseNames = (expertiseIds: string[]) =>
+    expertiseIds
       .map((id) => courses.find((c) => c.id === id)?.name)
       .filter(Boolean)
       .join(", ");
-  };
 
   const handleOpenModal = (trainer: Trainer | null = null) => {
     if (trainer) {
@@ -188,9 +127,7 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
-  ) => {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
+  ) => setFormState({ ...formState, [e.target.name]: e.target.value });
 
   const handleExpertiseChange = (courseId: string) => {
     const newExpertise = formState.expertise.includes(courseId)
@@ -208,11 +145,7 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
 
   const handleSubmit = () => {
     if (formState.name && formState.email) {
-      if (editingTrainer) {
-        updateTrainer(formState as Trainer);
-      } else {
-        addTrainer(formState);
-      }
+      editingTrainer ? updateTrainer(formState as Trainer) : addTrainer(formState);
       handleCloseModal();
     } else {
       alert("Please fill Name and Email fields.");
@@ -228,38 +161,18 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "24px",
-        }}
-      >
-        <h1 style={{ fontSize: "30px", fontWeight: "bold", color: "#1E293B" }}>
-          Trainers
-        </h1>
-        <button
-          onClick={() => handleOpenModal()}
-          style={{
-            backgroundColor: "#4F46E5",
-            color: "#fff",
-            padding: "8px 16px",
-            borderRadius: "8px",
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
+      <div className={styles.header}>
+        <h1 className={styles.title}>Trainers</h1>
+        <button onClick={() => handleOpenModal()} className={styles.addBtn}>
           Add Trainer
         </button>
       </div>
 
       <Table headers={["Name", "Expertise", "Contact", "Actions"]}>
         {trainers.map((trainer) => (
-          <tr key={trainer.id} style={{ borderBottom: "1px solid #E2E8F0" }}>
-            <td style={{ padding: "12px 16px", verticalAlign: "middle" }}>
-              <div style={{ display: "flex", alignItems: "center" }}>
+          <tr key={trainer.id} className={styles.row}>
+            <td className={styles.cell}>
+              <div className={styles.trainerInfo}>
                 <img
                   src={
                     trainer.imageUrl ||
@@ -269,65 +182,29 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
                     )}&background=random`
                   }
                   alt={trainer.name}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    borderRadius: "50%",
-                    marginRight: "12px",
-                    objectFit: "cover",
-                  }}
+                  className={styles.avatar}
                 />
-                <span style={{ fontWeight: 500, color: "#1E293B" }}>
-                  {trainer.name}
-                </span>
+                <span className={styles.trainerName}>{trainer.name}</span>
               </div>
             </td>
-            <td
-              style={{
-                padding: "16px",
-                verticalAlign: "middle",
-                color: "#475569",
-              }}
-            >
-              {getExpertiseNames(trainer.expertise)}
-            </td>
-            <td
-              style={{
-                padding: "16px",
-                verticalAlign: "middle",
-                color: "#475569",
-              }}
-            >
+            <td className={styles.cell}>{getExpertiseNames(trainer.expertise)}</td>
+            <td className={styles.cell}>
               <div>{trainer.email}</div>
-              <div style={{ fontSize: "12px" }}>{trainer.phone}</div>
+              <div className={styles.phone}>{trainer.phone}</div>
             </td>
-            <td style={{ padding: "16px", verticalAlign: "middle" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <td className={styles.cell}>
+              <div className={styles.actions}>
                 <button
                   onClick={() => handleOpenModal(trainer)}
-                  style={{
-                    padding: "4px",
-                    borderRadius: "50%",
-                    color: "#64748B",
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                  }}
+                  className={styles.iconBtn}
                 >
-                  <EditIcon style={{ width: "20px", height: "20px" }} />
+                  <EditIcon className={styles.icon} />
                 </button>
                 <button
                   onClick={() => setTrainerToDelete(trainer)}
-                  style={{
-                    padding: "4px",
-                    borderRadius: "50%",
-                    color: "#64748B",
-                    border: "none",
-                    background: "transparent",
-                    cursor: "pointer",
-                  }}
+                  className={styles.iconBtn}
                 >
-                  <DeleteIcon style={{ width: "20px", height: "20px" }} />
+                  <DeleteIcon className={styles.icon} />
                 </button>
               </div>
             </td>
@@ -403,89 +280,32 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
             />
 
             {/* Expertise Section */}
-            <div style={{ marginBottom: "16px" }}>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "#334155",
-                  marginBottom: "8px",
-                }}
-              >
-                Expertise
-              </label>
-              <div
-                style={{
-                  display: "grid",
-                  gap: "8px",
-                  padding: "8px",
-                  border: "1px solid #E2E8F0",
-                  borderRadius: "6px",
-                }}
-              >
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Expertise</label>
+              <div className={styles.expertiseBox}>
                 {courses.map((course) => (
-                  <label
-                    key={course.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "8px",
-                      borderRadius: "6px",
-                      backgroundColor: "#F8FAFC",
-                    }}
-                  >
+                  <label key={course.id} className={styles.expertiseItem}>
                     <input
                       type="checkbox"
                       checked={formState.expertise.includes(course.id)}
                       onChange={() => handleExpertiseChange(course.id)}
                     />
-                    <span style={{ fontSize: "14px", color: "#1E293B" }}>
-                      {course.name}
-                    </span>
+                    <span>{course.name}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                marginTop: "16px",
-                paddingTop: "16px",
-                borderTop: "1px solid #E2E8F0",
-              }}
-            >
+            <div className={styles.actionsRow}>
               <button
                 type="button"
                 onClick={handleCloseModal}
-                style={{
-                  marginRight: "8px",
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  backgroundColor: "#E2E8F0",
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className={styles.cancelBtn}
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "6px",
-                  backgroundColor: "#4F46E5",
-                  color: "#fff",
-                  fontWeight: 600,
-                  border: "none",
-                  cursor: "pointer",
-                }}
-              >
+              <button type="submit" className={styles.submitBtn}>
                 {editingTrainer ? "Save Changes" : "Add Trainer"}
               </button>
             </div>

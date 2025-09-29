@@ -1,0 +1,22 @@
+.appContainer {
+  display: flex;
+  height: 100vh;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+
+  &.light {
+    background-color: #f8fafc; // slate-50
+    color: #1e293b; // slate-800
+  }
+
+  &.dark {
+    background-color: #0f172a; // slate-950
+    color: #e2e8f0; // slate-200
+  }
+}
+
+.mainContent {
+  flex: 1;
+  padding: 1.5rem; // p-6
+  padding-inline: 2rem; // md:p-8
+  overflow-y: auto;
+}

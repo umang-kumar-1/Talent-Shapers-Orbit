@@ -4,7 +4,7 @@ import Table from '../common/Table';
 import Modal from '../common/Modal';
 import ConfirmationModal from '../common/ConfirmationModal';
 import { useMockData } from '../../hooks/useMockData';
-import type { FeePayment } from '../../types';
+import type { FeePayment } from "../../../../types";
 
 // Icons
 const EditIcon: React.FC<{ className?: string }> = (props) => (

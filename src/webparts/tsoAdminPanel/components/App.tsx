@@ -1,42 +1,43 @@
-import * as React from 'react';
-import Sidebar from '../components/Sidebar';
-import DashboardView from '../components/views/DashboardView';
-import StudentsView from '../components/views/StudentsView';
-import StudentProfileView from '../components/views/StudentProfileView';
-import TrainersView from '../components/views/TrainersView';
-import CoursesView from '../components/views/CoursesView';
-import FeesView from '../components/views/FeesView';
-import ExpensesView from '../components/views/ExpensesView';
-import AssignmentsView from '../components/views/AssignmentsView';
-import { useMockData } from '../hooks/useMockData';
-import { useEffect, useState } from 'react';
+import * as React from "react";
+import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
+import DashboardView from "../components/views/DashboardView";
+import StudentsView from "../components/views/StudentsView";
+import StudentProfileView from "../components/views/StudentProfileView";
+import TrainersView from "../components/views/TrainersView";
+import CoursesView from "../components/views/CoursesView";
+import FeesView from "../components/views/FeesView";
+import ExpensesView from "../components/views/ExpensesView";
+import AssignmentsView from "../components/views/AssignmentsView";
+import { useMockData } from "../hooks/useMockData";
+import styles from "./App.module.scss";
 
 export type ViewType =
-  | 'dashboard'
-  | 'students'
-  | 'trainers'
-  | 'courses'
-  | 'fees'
-  | 'expenses'
-  | 'assignments';
+  | "dashboard"
+  | "students"
+  | "trainers"
+  | "courses"
+  | "fees"
+  | "expenses"
+  | "assignments";
 
 const App: React.FC = () => {
-  const [activeView, setActiveView] = useState<ViewType>('dashboard');
+  const [activeView, setActiveView] = useState<ViewType>("dashboard");
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    return (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    return (localStorage.getItem("theme") as "light" | "dark") || "light";
   });
   const mockData = useMockData();
 
   useEffect(() => {
     const root = window.document.documentElement;
-    root.classList.remove('light', 'dark');
+    root.classList.remove("light", "dark");
     root.classList.add(theme);
-    localStorage.setItem('theme', theme);
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
   const handleViewProfile = (studentId: string) => {
@@ -59,19 +60,19 @@ const App: React.FC = () => {
     }
 
     switch (activeView) {
-      case 'dashboard':
+      case "dashboard":
         return <DashboardView data={mockData} />;
-      case 'students':
+      case "students":
         return <StudentsView data={mockData} onViewProfile={handleViewProfile} />;
-      case 'trainers':
+      case "trainers":
         return <TrainersView data={mockData} />;
-      case 'courses':
+      case "courses":
         return <CoursesView data={mockData} />;
-      case 'fees':
+      case "fees":
         return <FeesView data={mockData} />;
-      case 'expenses':
+      case "expenses":
         return <ExpensesView data={mockData} />;
-      case 'assignments':
+      case "assignments":
         return <AssignmentsView data={mockData} />;
       default:
         return <DashboardView data={mockData} />;
@@ -79,31 +80,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        height: '100vh',
-        backgroundColor: theme === 'dark' ? '#0f172a' : '#f8fafc', // dark:bg-slate-950 / bg-slate-50
-        color: theme === 'dark' ? '#e2e8f0' : '#1e293b', // dark:text-slate-200 / text-slate-800
-        fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-      }}
-    >
+    <div className={`${styles.appContainer} ${styles[theme]}`}>
       <Sidebar
         activeView={activeView}
         setActiveView={setActiveView}
         theme={theme}
         toggleTheme={toggleTheme}
       />
-      <main
-        style={{
-          flex: 1,
-          padding: '1.5rem', // p-6
-          paddingInline: '2rem', // md:p-8 (approx.)
-          overflowY: 'auto',
-        }}
-      >
-        {renderView()}
-      </main>
+      <main className={styles.mainContent}>{renderView()}</main>
     </div>
   );
 };

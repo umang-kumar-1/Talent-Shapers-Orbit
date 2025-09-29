@@ -4,7 +4,8 @@ import Table from '../common/Table';
 import Modal from '../common/Modal';
 import ConfirmationModal from '../common/ConfirmationModal';
 import { useMockData } from '../../hooks/useMockData';
-import type { Student } from '../../types';
+import type { Student } from '../../../../types';
+import styles from './StudentsView.module.scss';
 
 // Icons
 const EditIcon: React.FC<{ className?: string }> = (props) => (
@@ -20,54 +21,21 @@ const DeleteIcon: React.FC<{ className?: string }> = (props) => (
 
 // Reusable Form Components
 const FormInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label: string }> = ({ label, ...props }) => (
-  <div style={{ marginBottom: '1rem' }}>
-    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem', color: '#334155' }}>{label}</label>
-    <input
-      {...props}
-      style={{
-        width: '100%',
-        padding: '0.5rem 0.75rem',
-        border: '1px solid #cbd5e1',
-        borderRadius: '0.375rem',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-        outline: 'none'
-      }}
-    />
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <input {...props} className={styles.input} />
   </div>
 );
 const FormSelect: React.FC<React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }> = ({ label, children, ...props }) => (
-  <div style={{ marginBottom: '1rem' }}>
-    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem', color: '#334155' }}>{label}</label>
-    <select
-      {...props}
-      style={{
-        width: '100%',
-        padding: '0.5rem 0.75rem',
-        border: '1px solid #cbd5e1',
-        borderRadius: '0.375rem',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-        outline: 'none'
-      }}
-    >
-      {children}
-    </select>
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <select {...props} className={styles.select}>{children}</select>
   </div>
 );
 const FormTextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }> = ({ label, ...props }) => (
-  <div style={{ marginBottom: '1rem' }}>
-    <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.25rem', color: '#334155' }}>{label}</label>
-    <textarea
-      {...props}
-      rows={3}
-      style={{
-        width: '100%',
-        padding: '0.5rem 0.75rem',
-        border: '1px solid #cbd5e1',
-        borderRadius: '0.375rem',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-        outline: 'none'
-      }}
-    />
+  <div className={styles.formGroup}>
+    <label className={styles.label}>{label}</label>
+    <textarea {...props} className={styles.textarea} />
   </div>
 );
 
@@ -102,9 +70,8 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
   };
   const [formState, setFormState] = useState(initialFormState);
 
-  const getCourseNames = (courseIds: string[]) => {
-    return courseIds.map((id) => courses.find((c) => c.id === id)?.name).filter(Boolean).join(', ');
-  };
+  const getCourseNames = (courseIds: string[]) =>
+    courseIds.map((id) => courses.find((c) => c.id === id)?.name).filter(Boolean).join(', ');
 
   const handleOpenModal = (student: Student | null = null) => {
     if (student) {
@@ -123,9 +90,8 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
     setFormState(initialFormState);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setFormState({ ...formState, [e.target.name]: e.target.value });
-  };
 
   const handleCourseChange = (courseId: string) => {
     const newCourseIds = formState.courseIds.includes(courseId)
@@ -143,11 +109,7 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
 
   const handleSubmit = () => {
     if (formState.name && formState.email && formState.courseIds.length > 0) {
-      if (editingStudent) {
-        updateStudent(formState as Student);
-      } else {
-        addStudent(formState);
-      }
+      editingStudent ? updateStudent(formState as Student) : addStudent(formState);
       handleCloseModal();
     } else {
       alert('Please fill all required fields: Name, Email, and at least one Course.');
@@ -164,69 +126,41 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1e293b' }}>Students</h1>
-        <button
-          onClick={() => handleOpenModal()}
-          style={{
-            backgroundColor: '#4f46e5',
-            color: '#fff',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.5rem',
-            fontWeight: 600,
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-          }}
-        >
-          Add Student
-        </button>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Students</h1>
+        <button onClick={() => handleOpenModal()} className={styles.addBtn}>Add Student</button>
       </div>
 
       {/* Table */}
       <Table headers={['Name', 'Courses', 'Join Date', 'Status', 'Actions']}>
         {students.map((student) => (
-          <tr key={student.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-            <td style={{ padding: '0.75rem 1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+          <tr key={student.id} className={styles.tableRow}>
+            <td className={styles.tableCell}>
+              <div className={styles.studentInfo}>
                 <img
                   src={student.imageUrl || `https://ui-avatars.com/api/?name=${student.name.replace(' ', '+')}&background=random`}
                   alt={student.name}
-                  style={{ width: '2.5rem', height: '2.5rem', borderRadius: '9999px', marginRight: '0.75rem', objectFit: 'cover' }}
+                  className={styles.avatar}
                 />
                 <div>
-                  <button
-                    onClick={() => onViewProfile(student.id)}
-                    style={{ fontWeight: 500, color: '#4f46e5', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
-                  >
+                  <button onClick={() => onViewProfile(student.id)} className={styles.nameBtn}>
                     {student.name}
                   </button>
-                  <div style={{ fontSize: '0.875rem', color: '#64748b' }}>{student.email}</div>
+                  <div className={styles.email}>{student.email}</div>
                 </div>
               </div>
             </td>
-            <td style={{ padding: '1rem', color: '#475569' }}>{getCourseNames(student.courseIds)}</td>
-            <td style={{ padding: '1rem', color: '#475569' }}>{student.joinDate}</td>
-            <td style={{ padding: '1rem' }}>
-              <span
-                style={{
-                  padding: '0.25rem 0.75rem',
-                  fontSize: '0.75rem',
-                  fontWeight: 'bold',
-                  borderRadius: '9999px',
-                  backgroundColor: student.status === 'Active' ? '#dcfce7' : '#e2e8f0',
-                  color: student.status === 'Active' ? '#166534' : '#475569'
-                }}
-              >
+            <td className={styles.tableCell}>{getCourseNames(student.courseIds)}</td>
+            <td className={styles.tableCell}>{student.joinDate}</td>
+            <td className={styles.tableCell}>
+              <span className={`${styles.status} ${student.status === 'Active' ? styles.active : styles.inactive}`}>
                 {student.status}
               </span>
             </td>
-            <td style={{ padding: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <button onClick={() => handleOpenModal(student)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569' }}>
-                  <EditIcon  />
-                </button>
-                <button onClick={() => setStudentToDelete(student)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444' }}>
-                  <DeleteIcon />
-                </button>
+            <td className={styles.tableCell}>
+              <div className={styles.actions}>
+                <button onClick={() => handleOpenModal(student)} className={styles.iconBtn}><EditIcon /></button>
+                <button onClick={() => setStudentToDelete(student)} className={styles.deleteBtn}><DeleteIcon /></button>
               </div>
             </td>
           </tr>
@@ -255,7 +189,7 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
             <FormInput label="Full Name" name="name" value={formState.name} onChange={handleInputChange} required />
             <FormInput label="Email Address" name="email" type="email" value={formState.email} onChange={handleInputChange} required />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className={styles.twoColGrid}>
               <FormInput label="Phone Number" name="phone" type="tel" value={formState.phone} onChange={handleInputChange} />
               <FormSelect label="Gender" name="gender" value={formState.gender} onChange={handleInputChange} required>
                 <option value="Male">Male</option>
@@ -266,7 +200,7 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
 
             <FormTextArea label="Address" name="address" value={formState.address} onChange={handleInputChange} />
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div className={styles.twoColGrid}>
               <FormInput label="Profile Picture" name="imageUrl" type="file" accept="image/*" onChange={handleFileChange} />
               <FormSelect label="Status" name="status" value={formState.status} onChange={handleInputChange} required>
                 <option value="Active">Active</option>
@@ -274,43 +208,26 @@ const StudentsView: React.FC<StudentsViewProps> = ({ data, onViewProfile }) => {
               </FormSelect>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem', color: '#334155' }}>Courses</label>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '0.5rem',
-                  maxHeight: '8rem',
-                  overflowY: 'auto',
-                  padding: '0.5rem',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '0.375rem'
-                }}
-              >
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Courses</label>
+              <div className={styles.courseList}>
                 {courses.map((course) => (
-                  <label key={course.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', borderRadius: '0.375rem', backgroundColor: '#f8fafc' }}>
+                  <label key={course.id} className={styles.courseItem}>
                     <input
                       type="checkbox"
-                      style={{ width: '1rem', height: '1rem' }}
+                      className={styles.checkbox}
                       checked={formState.courseIds.includes(course.id)}
                       onChange={() => handleCourseChange(course.id)}
                     />
-                    <span style={{ fontSize: '0.875rem', color: '#1e293b' }}>{course.name}</span>
+                    <span className={styles.courseName}>{course.name}</span>
                   </label>
                 ))}
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '1rem', marginTop: '1rem', borderTop: '1px solid #e2e8f0' }}>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                style={{ marginRight: '0.5rem', padding: '0.5rem 1rem', borderRadius: '0.375rem', backgroundColor: '#e2e8f0', color: '#334155', fontWeight: 600 }}
-              >
-                Cancel
-              </button>
-              <button type="submit" style={{ padding: '0.5rem 1rem', borderRadius: '0.375rem', backgroundColor: '#4f46e5', color: '#fff', fontWeight: 600 }}>
+            <div className={styles.modalFooter}>
+              <button type="button" onClick={handleCloseModal} className={styles.cancelBtn}>Cancel</button>
+              <button type="submit" className={styles.saveBtn}>
                 {editingStudent ? 'Save Changes' : 'Add Student'}
               </button>
             </div>

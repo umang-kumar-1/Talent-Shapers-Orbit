@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fluentui/react": "^8.106.4",
+    "@heroicons/react": "^2.2.0",
     "@microsoft/sp-component-base": "1.21.1",
     "@microsoft/sp-core-library": "1.21.1",
     "@microsoft/sp-lodash-subset": "1.21.1",
@@ -40,6 +41,7 @@
     "eslint-plugin-react-hooks": "4.3.0",
     "gulp": "4.0.2",
     "postcss": "^8.5.6",
+    "sass": "^1.93.2",
     "tailwindcss": "^4.1.13",
     "typescript": "~5.3.3"
   }
