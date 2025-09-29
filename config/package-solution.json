@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "tso-admin-panel-client-side-solution",
+    "id": "57277341-0808-4344-9e94-85d56418ae4b",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "tsoAdminPanel description"
+      },
+      "longDescription": {
+        "default": "tsoAdminPanel description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "tso-admin-panel Feature",
+        "description": "The feature that activates elements of the tso-admin-panel solution.",
+        "id": "e46b05b4-a879-4b06-83f2-9d059443fe3a",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/tso-admin-panel.sppkg"
+  }
+}
