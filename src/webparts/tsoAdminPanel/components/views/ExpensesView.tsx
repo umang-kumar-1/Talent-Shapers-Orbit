@@ -6,7 +6,8 @@ import ConfirmationModal from '../common/ConfirmationModal';
 import { useMockData } from '../../hooks/useMockData';
 import type { Expense } from "../../../../types";
 import styles from "./ExpensesView.module.scss";
-import { ExpenseContext } from '../context/ExpenseContext';
+import { ExpensesMethods } from '../useExpensesMethods';
+
 
 // Icons
 const EditIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -60,7 +61,6 @@ const toBase64 = (file: File): Promise<string> =>
   });
 
 const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data }) => {
-  const {expenseData } = React.useContext(ExpenseContext);
   const { addExpense, updateExpense, deleteExpense } = data;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -75,6 +75,7 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
     comments: ''
   };
   const [formState, setFormState] = useState(initialFormState);
+  const { expenseData } = ExpensesMethods();
 
   const handleOpenModal = (expense: Expense | null = null) => {
     if (expense) {
