@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { web } from "../PnpUrl";
+import { web } from "../../PnpUrl";
 
 export function ExpensesMethods() {
     const [expenseData, setExpenseData] = useState<any[]>([]);

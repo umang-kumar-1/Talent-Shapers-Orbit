@@ -3,7 +3,7 @@ import Card from '../common/Card';
 import { useMockData } from '../../hooks/useMockData';
 
 import styles from './DashboardView.module.scss';
-import { ExpensesMethods } from '../ExpensesMethods';
+import { ExpensesMethods } from '../services/ExpensesMethods';
 
 const cardColors = {
   students: { bg: '#DBEAFE', icon: '#2563EB' },   // blue
