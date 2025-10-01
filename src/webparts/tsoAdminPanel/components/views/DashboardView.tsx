@@ -3,6 +3,7 @@ import Card from '../common/Card';
 import { useMockData } from '../../hooks/useMockData';
 
 import styles from './DashboardView.module.scss';
+import { ExpensesMethods } from '../ExpensesMethods';
 
 const cardColors = {
   students: { bg: '#DBEAFE', icon: '#2563EB' },   // blue
@@ -12,7 +13,8 @@ const cardColors = {
 };
 
 const DashboardView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data }) => {
-  const { students, trainers, courses, feePayments, expenses } = data;
+  const { students, trainers, courses, feePayments} = data;
+  const { expenseData } = ExpensesMethods();
 
   const totalRevenue = feePayments.filter(f => f.status === 'Paid').reduce((sum, f) => sum + f.amount, 0);
   const activeStudentsCount = students.filter(s => s.status === 'Active').length;
@@ -56,12 +58,12 @@ const DashboardView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ dat
                 </li>
               );
             })}
-            {expenses.slice(-2).reverse().map(expense => (
+            {expenseData.slice(-2).reverse().map(expense => (
               <li key={expense.id} className={styles.activityItem}>
                 <span className={styles.activityLabel}>
-                  Expense: <span className={styles.expenseHighlight}>{expense.description}</span>
+                  Expense: <span className={styles.expenseHighlight}>{expense.Description}</span>
                 </span>
-                <span className={styles.expenseAmount}>-₹{expense.amount}</span>
+                <span className={styles.expenseAmount}>-₹{expense.Amount}</span>
               </li>
             ))}
           </ul>
