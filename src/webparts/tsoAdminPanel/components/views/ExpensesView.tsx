@@ -6,7 +6,7 @@ import ConfirmationModal from '../common/ConfirmationModal';
 import { useMockData } from '../../hooks/useMockData';
 import type { Expense } from "../../../../types";
 import styles from "./ExpensesView.module.scss";
-import { ExpensesMethods } from '../useExpensesMethods';
+import { ExpensesMethods } from '../ExpensesMethods';
 
 
 // Icons
@@ -52,69 +52,111 @@ const FormTextArea: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> &
   </div>
 );
 
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = error => reject(error);
-  });
 
 const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data }) => {
-  const { addExpense, updateExpense, deleteExpense } = data;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null);
 
-  const initialFormState: Omit<Expense, 'id'> = {
+  const initialFormState: any = {
     description: '',
     category: 'Other',
     amount: 0,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString(),
     billUrl: '',
     comments: ''
   };
-  const [formState, setFormState] = useState(initialFormState);
-  const { expenseData } = ExpensesMethods();
 
-  const handleOpenModal = (expense: Expense | null = null) => {
+  const [formState, setFormState] = useState(initialFormState);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { expenseData, addExpense, updateExpense, deleteExpense } = ExpensesMethods();
+
+  const handleOpenModal = (expense: any) => {
     if (expense) {
       setEditingExpense(expense);
-      setFormState(expense);
+      setFormState((prev:any) => ({
+        ...prev,
+        description: expense.Description || '',
+        category: expense.Category || 'Other',
+        amount: expense.Amount || 0,
+        date: expense.Date ? new Date(expense.Date).toISOString().substring(0, 10) : new Date().toISOString().substring(0, 10),
+        comments: expense.Comments || '',
+        billUrl: expense.billUrl || expense.Reciept || ''
+      }));
+      setPreviewUrl(expense.billUrl || expense.Reciept || null);
     } else {
       setEditingExpense(null);
       setFormState(initialFormState);
+      setPreviewUrl(null);
     }
+    setSelectedFile(null);
     setIsModalOpen(true);
   };
+
+  const handleFileChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+    const file: File | null = evt.target.files?.[0] || null;
+    
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB');
+        return;
+      }
+      
+      setSelectedFile(file);
+      
+      // Create preview URL
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    } else {
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  };
+
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingExpense(null);
     setFormState(initialFormState);
+    setSelectedFile(null);
+    
+    // Clean up preview URL if it was created from a file
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+
+  const handleInputChange = (e:any):any => {
     const { name, value, type } = e.target;
-    setFormState(prev => ({
+
+    setFormState((prev: any) => ({
       ...prev,
       [name]: type === 'number' ? parseFloat(value) || 0 : value,
     }));
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const base64 = await toBase64(e.target.files[0]);
-      setFormState({ ...formState, billUrl: base64 });
-    }
-  };
 
   const handleSubmit = () => {
     if (formState.description && formState.amount > 0) {
+      const expenseData = {
+        ...formState,
+        file: selectedFile
+      };
+      
       if (editingExpense) {
-        updateExpense(formState as Expense);
+        updateExpense({ ...editingExpense, ...expenseData });
       } else {
-        addExpense(formState);
+        addExpense(expenseData);
       }
       handleCloseModal();
     } else {
@@ -124,17 +166,18 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
 
   const handleDelete = () => {
     if (expenseToDelete) {
-      deleteExpense(expenseToDelete.id);
+      deleteExpense(expenseToDelete);
       setExpenseToDelete(null);
     }
   };
+
 
   return (
     <div>
       {/* Header */}
       <div className={styles.header}>
         <h1 className={styles.title}>Expenses</h1>
-        <button onClick={() => handleOpenModal()} className={styles.addButton}>
+        <button onClick={() => handleOpenModal(null)} className={styles.addButton}>
           Add Expense
         </button>
       </div>
@@ -152,9 +195,15 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
             <td className={styles.tableCell}>{item.Date.substring(0, 10)}</td>
             <td className={styles.tableCell}>
               {item.billUrl ? (
-                <a href={item.billUrl} target="_blank" rel="noopener noreferrer" className={styles.billLink}>
-                  <DocumentIcon className={styles.icon} />
-                </a>
+                <div className={'imageContainer'}>
+                  <button 
+                    onClick={() => window.open(item.billUrl, '_blank')}
+                    className="previewButton"
+                    title="Click to view receipt"
+                  >
+                    <DocumentIcon className={styles.icon} />
+                  </button>
+                </div>
               ) : (
                 <span className={styles.noBill}>-</span>
               )}
@@ -200,7 +249,69 @@ const ExpensesView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({ data
             </div>
             <FormInput label="Date" name="date" type="date" value={formState.date} onChange={handleInputChange} required />
             <FormTextArea label="Comments" name="comments" value={formState.comments ?? ''} onChange={handleInputChange} />
-            <FormInput label="Bill/Receipt" name="billUrl" type="file" onChange={handleFileChange} />
+            
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Bill/Receipt</label>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleFileChange}
+                className={styles.formInput}
+              />
+              {previewUrl && (
+                <div className={'existingImageContainer'}>
+                  {/* Show actual image for both existing expense and new file uploads */}
+                  {editingExpense && !selectedFile ? (
+                    // Existing expense - show current image with info
+                    <div className="existingImageContainer">
+                      <img 
+                        src={previewUrl} 
+                        alt="Current receipt" 
+                        className="existingImage"
+                      />
+                      <div className="imageInfo">
+                        <span className="imageLabel">Current receipt</span>
+                        <a 
+                          href={previewUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="viewFullImageLink"
+                        >
+                          View full size
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    // New file upload - show image preview
+                    <div className="newImageContainer">
+                      <img 
+                        src={previewUrl} 
+                        alt="Preview" 
+                        className="newImagePreview"
+                      />
+                      <div className="imageInfo">
+                        <span className="imageLabel">
+                          {selectedFile ? "New image selected" : "Image preview"}
+                        </span>
+                        <span className="imageSize">
+                          {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : ""}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setSelectedFile(null);
+                      setPreviewUrl(null);
+                    }}
+                    className={'removeImageButton'}
+                  >
+                    Remove Image
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className={styles.modalActions}>
               <button type="button" onClick={handleCloseModal} className={styles.cancelButton}>Cancel</button>

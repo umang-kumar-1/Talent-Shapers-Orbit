@@ -56,10 +56,38 @@
 .billLink {
   color: #4f46e5;
   display: inline-block;
+  margin-left: 0.5rem;
 }
 
 .noBill {
   color: #94a3b8;
+}
+
+.imageContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.previewButton {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+  }
+  
+  &:active {
+    transform: translateY(1px);
+  }
 }
 
 .actions {
@@ -150,5 +178,118 @@
 
   &:hover {
     background-color: #4338ca;
+  }
+}
+
+/* Image Preview Styles */
+.imagePreview {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background-color: #f8fafc;
+}
+
+.previewIconContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.previewIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #4f46e5;
+}
+
+.previewText {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+/* Existing Image Styles */
+.existingImageContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 0.375rem;
+  border: 1px solid #e2e8f0;
+}
+
+.existingImage {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.imageInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.imageLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.viewFullImageLink {
+  font-size: 0.75rem;
+  color: #4f46e5;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* New Image Preview Styles */
+.newImageContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem;
+  background-color: white;
+  border-radius: 0.375rem;
+  border: 1px solid #e2e8f0;
+}
+
+.newImagePreview {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.imageSize {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.removeImageButton {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #dc2626;
   }
 }

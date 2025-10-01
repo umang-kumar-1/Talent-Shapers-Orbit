@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
 import type { Student, Trainer, Course, FeePayment, Expense, Assignment } from '../../../types';
+// import { web } from '../PnpUrl';
+
 
 const initialCourses: Course[] = [
   { id: 'c1', name: 'Fundamentals of Spoken English', category: 'Spoken English', level: 'Basic', duration: '3 Months', totalFee: 1000 },
@@ -10,6 +12,7 @@ const initialCourses: Course[] = [
 ];
 
 const initialTrainers: Trainer[] = [
+    
   { id: 't1', name: 'John Doe', email: 'john.doe@example.com', expertise: ['c1', 'c2'], phone: '555-0101', address: '123 Grammar Lane', imageUrl: `https://i.pravatar.cc/150?u=t1`, gender: 'Male' },
   { id: 't2', name: 'Jane Smith', email: 'jane.smith@example.com', expertise: ['c3', 'c4'], phone: '555-0102', address: '456 Code Street', imageUrl: `https://i.pravatar.cc/150?u=t2`, gender: 'Female' },
 ];
@@ -42,11 +45,28 @@ const initialAssignments: Assignment[] = [
 
 export const useMockData = () => {
     const [courses, setCourses] = useState<Course[]>(initialCourses);
-    const [trainers, setTrainers] = useState<Trainer[]>(initialTrainers);
     const [students, setStudents] = useState<Student[]>(initialStudents);
     const [feePayments, setFeePayments] = useState<FeePayment[]>(initialFeePayments);
     const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
     const [assignments, setAssignments] = useState<Assignment[]>(initialAssignments);
+    // const [trainerData, setTrainerData ] = useState<any[]>([]);
+    const [trainers, setTrainers] = useState<any[]>(initialTrainers);
+
+    // useEffect(() => {
+    // (async (): Promise<void> => {
+    //     try {
+    //     const res = await web.lists.getByTitle('TsharperTrainer').items.expand('Experties').get();
+    //     setTrainerData(res);
+    //     console.log("trainer response ::", res);
+    //     } catch (error) {
+    //     console.log("trainer data error :: ", error);
+    //     }
+    // })();
+    // }, []);
+
+    // useEffect(() => {
+    // console.log("trainer data updated :: ", trainerData);
+    // }, [trainerData]);
     
     const createId = (prefix: string) => `${prefix}${Date.now()}`;
     const getCurrentDate = () => new Date().toISOString().split('T')[0];
