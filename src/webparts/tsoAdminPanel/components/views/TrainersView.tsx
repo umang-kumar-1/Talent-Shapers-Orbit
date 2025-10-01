@@ -4,7 +4,7 @@ import Table from "../common/Table";
 import Modal from "../common/Modal";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { useMockData } from "../../hooks/useMockData";
-import type { Trainer } from "../../../../types";
+import { TrainerMethods } from "../services/TrainerMethods";
 import styles from "./TrainersView.module.scss"; // ✅ Import CSS Module
 
 // Icons
@@ -84,32 +84,46 @@ const toBase64 = (file: File): Promise<string> =>
 const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
   data,
 }) => {
-  const { trainers, courses, addTrainer, updateTrainer, deleteTrainer } = data;
+  const { courses } = data; // retained if needed elsewhere, but expertise now comes from SP
+  const {
+    trainerData,
+    expertiseOptions,
+    addTrainer: spAddTrainer,
+    updateTrainer: spUpdateTrainer,
+    deleteTrainer: spDeleteTrainer,
+  } = TrainerMethods();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTrainer, setEditingTrainer] = useState<Trainer | null>(null);
-  const [trainerToDelete, setTrainerToDelete] = useState<Trainer | null>(null);
+  const [editingTrainer, setEditingTrainer] = useState<any | null>(null);
+  const [trainerToDelete, setTrainerToDelete] = useState<any | null>(null);
 
-  const initialFormState: Omit<Trainer, "id"> = {
-    name: "",
+  const initialFormState = {
+    fullName: "",
     email: "",
-    expertise: [],
+    expertiseIds: [] as number[],
     phone: "",
     address: "",
     imageUrl: "",
+    imageFile: undefined as File | undefined,
     gender: "Male",
   };
   const [formState, setFormState] = useState(initialFormState);
 
-  const getExpertiseNames = (expertiseIds: string[]) =>
-    expertiseIds
-      .map((id) => courses.find((c) => c.id === id)?.name)
-      .filter(Boolean)
-      .join(", ");
+  const getExpertiseNames = (expertiseTitles: string[]) =>
+    (expertiseTitles || []).filter(Boolean).join(", ");
 
-  const handleOpenModal = (trainer: Trainer | null = null) => {
+  const handleOpenModal = (trainer: any | null = null) => {
     if (trainer) {
       setEditingTrainer(trainer);
-      setFormState(trainer);
+      setFormState({
+        fullName: trainer.FullName || "",
+        email: trainer.Email || "",
+        phone: trainer.Phone || "",
+        address: trainer.Address || "",
+        gender: trainer.Gender || "Male",
+        expertiseIds: trainer.ExpertiseIds || [],
+        imageUrl: trainer.ProfileUrl || "",
+        imageFile: undefined,
+      });
     } else {
       setEditingTrainer(null);
       setFormState(initialFormState);
@@ -129,23 +143,41 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
     >
   ) => setFormState({ ...formState, [e.target.name]: e.target.value });
 
-  const handleExpertiseChange = (courseId: string) => {
-    const newExpertise = formState.expertise.includes(courseId)
-      ? formState.expertise.filter((id) => id !== courseId)
-      : [...formState.expertise, courseId];
-    setFormState({ ...formState, expertise: newExpertise });
+  const handleExpertiseChange = (expertiseId: number) => {
+    const newExpertise = formState.expertiseIds.includes(expertiseId)
+      ? formState.expertiseIds.filter((id) => id !== expertiseId)
+      : [...formState.expertiseIds, expertiseId];
+    setFormState({ ...formState, expertiseIds: newExpertise });
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const base64 = await toBase64(e.target.files[0]);
-      setFormState({ ...formState, imageUrl: base64 });
+      const file = e.target.files[0];
+      setFormState({ ...formState, imageFile: file });
     }
   };
 
   const handleSubmit = () => {
-    if (formState.name && formState.email) {
-      editingTrainer ? updateTrainer(formState as Trainer) : addTrainer(formState);
+    if (formState.fullName && formState.email) {
+      const payload: any = {
+        FullName: formState.fullName,
+        Email: formState.email,
+        Phone: formState.phone,
+        Address: formState.address,
+        Gender: formState.gender,
+        ExpertiseIds: formState.expertiseIds,
+      };
+      if (formState.imageFile) {
+        payload.imageFile = formState.imageFile;
+      } else if (formState.imageUrl) {
+        payload.imageUrl = formState.imageUrl;
+      }
+
+      if (editingTrainer) {
+        spUpdateTrainer(editingTrainer.Id, payload);
+      } else {
+        spAddTrainer(payload);
+      }
       handleCloseModal();
     } else {
       alert("Please fill Name and Email fields.");
@@ -154,7 +186,7 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
 
   const handleDelete = () => {
     if (trainerToDelete) {
-      deleteTrainer(trainerToDelete.id);
+      spDeleteTrainer(trainerToDelete.Id);
       setTrainerToDelete(null);
     }
   };
@@ -169,28 +201,28 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
       </div>
 
       <Table headers={["Name", "Expertise", "Contact", "Actions"]}>
-        {trainers.map((trainer) => (
-          <tr key={trainer.id} className={styles.row}>
+        {trainerData.map((trainer) => (
+          <tr key={trainer.Id} className={styles.row}>
             <td className={styles.cell}>
               <div className={styles.trainerInfo}>
                 <img
                   src={
-                    trainer.imageUrl ||
-                    `https://ui-avatars.com/api/?name=${trainer.name.replace(
+                    trainer.ProfileUrl ||
+                    `https://ui-avatars.com/api/?name=${(trainer.FullName || "").replace(
                       " ",
                       "+"
                     )}&background=random`
                   }
-                  alt={trainer.name}
+                  alt={trainer.FullName}
                   className={styles.avatar}
                 />
-                <span className={styles.trainerName}>{trainer.name}</span>
+                <span className={styles.trainerName}>{trainer.FullName}</span>
               </div>
             </td>
-            <td className={styles.cell}>{getExpertiseNames(trainer.expertise)}</td>
+            <td className={styles.cell}>{getExpertiseNames(trainer.ExpertiseTitles)}</td>
             <td className={styles.cell}>
-              <div>{trainer.email}</div>
-              <div className={styles.phone}>{trainer.phone}</div>
+              <div>{trainer.Email}</div>
+              <div className={styles.phone}>{trainer.Phone}</div>
             </td>
             <td className={styles.cell}>
               <div className={styles.actions}>
@@ -215,7 +247,7 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
       {trainerToDelete && (
         <ConfirmationModal
           title="Delete Trainer"
-          message={`Are you sure you want to delete ${trainerToDelete.name}?`}
+          message={`Are you sure you want to delete ${trainerToDelete.FullName}?`}
           onConfirm={handleDelete}
           onCancel={() => setTrainerToDelete(null)}
         />
@@ -234,8 +266,8 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
           >
             <FormInput
               label="Full Name"
-              name="name"
-              value={formState.name}
+              name="fullName"
+              value={formState.fullName}
               onChange={handleInputChange}
               required
             />
@@ -283,14 +315,14 @@ const TrainersView: React.FC<{ data: ReturnType<typeof useMockData> }> = ({
             <div className={styles.formGroup}>
               <label className={styles.label}>Expertise</label>
               <div className={styles.expertiseBox}>
-                {courses.map((course) => (
-                  <label key={course.id} className={styles.expertiseItem}>
+                {expertiseOptions.map((opt) => (
+                  <label key={opt.Id} className={styles.expertiseItem}>
                     <input
                       type="checkbox"
-                      checked={formState.expertise.includes(course.id)}
-                      onChange={() => handleExpertiseChange(course.id)}
+                      checked={formState.expertiseIds.includes(opt.Id)}
+                      onChange={() => handleExpertiseChange(opt.Id)}
                     />
-                    <span>{course.name}</span>
+                    <span>{opt.Title}</span>
                   </label>
                 ))}
               </div>
